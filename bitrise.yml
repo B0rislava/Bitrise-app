@@ -1,0 +1,25 @@
+format_version: '13'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: android
+
+app:
+  envs:
+    - PROJECT_LOCATION: "."
+    - MODULE: "app"
+    - VARIANT: "debug"
+
+workflows:
+  primary:
+    steps:
+      - activate-ssh-key@4:
+          run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+      - git-clone@8: {}
+      - install-missing-android-tools@3:
+          inputs:
+            - gradlew_path: "$PROJECT_LOCATION/gradlew"
+      - android-build@1:
+          inputs:
+            - project_location: "$PROJECT_LOCATION"
+            - module: "$MODULE"
+            - variant: "$VARIANT"
+      - deploy-to-bitrise-io@2: {}
